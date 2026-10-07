@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шахматы: Онлайн и Карьера</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #f8fafc; }
+        .square { display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; user-select: none; }
+        .light { background: #cbd5e1; }
+        .dark { background: #64748b; }
+        
+        /* Сделали фигуры в едином стиле (все белые с красивой тенью или все темные) */
+        .chess-piece {
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 2px rgba(0,0,0,0.5);
+            font-weight: bold;
+        }
+
+        .selected { background: #3b82f6 !important; }
+        .highlight { background: rgba(34, 197, 94, 0.65) !important; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-3">
+
+    <div class="w-full max-w-md bg-slate-800 p-5 rounded-xl shadow-2xl text-center">
+        <div id="screen-menu" class="space-y-3">
+            <h2 class="text-2xl font-bold text-sky-400 mb-4">♔ Шахматный Клуб</h2>
+            <button onclick="switchScreen('screen-online-menu')" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold p-3 rounded-lg shadow">🌐 Онлайн с другом по коду</button>
+            <button onclick="switchScreen('screen-story')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold p-3 rounded-lg shadow">🤖 Карьера (С ботом)</button>
+            <button onclick="startOffline()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold p-3 rounded-lg shadow">📱 Вдвоем на одном экране</button>
+        </div>
+
+        <div id="screen-online-menu" class="space-y-3 hidden">
+            <h3 class="text-xl font-bold text-sky-400 mb-2">🌐 Онлайн игра</h3>
+            <button onclick="createRoom()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3 rounded-lg shadow">➕ Создать комнату</button>
+            <div class="pt-3 border-t border-slate-700">
+                <input type="text" id="room-code-input" placeholder="Введите код комнаты (например 4782)" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-white mb-2 text-center uppercase font-mono">
+                <button onclick="joinRoom()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold p-3 rounded-lg shadow">🚪 Войти в комнату</button>
+            </div>
+            <button onclick="switchScreen('screen-menu')" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold p-3 rounded-lg mt-4">⬅️ Назад в меню</button>
+        </div>
+
+        <div id="screen-story" class="space-y-2 hidden">
+            <h3 class="text-xl font-bold text-sky-400 mb-2">📖 Уровень бота</h3>
+            <button onclick="startBotGame(1)" class="w-full bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-lg font-bold">👶 Новичок (Легкий)</button>
+            <button onclick="startBotGame(2)" class="w-full bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-lg font-bold">👦 Любитель (Средний)</button>
+            <button onclick="startBotGame(3)" class="w-full bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-lg font-bold">👨‍🎓 КМС (Продвинутый)</button>
+            <button onclick="startBotGame(4)" class="w-full bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-lg font-bold">🏆 Мастер (Сложный)</button>
+            <button onclick="startBotGame(5)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-lg font-bold">👑 Гроссмейстер (Умный)</button>
+            <button onclick="switchScreen('screen-menu')" class="w-full bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-lg mt-3">⬅️ Назад в меню</button>
+        </div>
+
+        <div id="screen-game" class="hidden space-y-3">
+            <div id="game-info" class="text-sm font-bold text-sky-400 bg-slate-900 p-2 rounded-lg">Загрузка игры...</div>
+            <div id="board" class="grid grid-cols-8 w-full aspect-square border-4 border-slate-700 rounded-lg overflow-hidden shadow-inner"></div>
+            <div id="status" class="text-base font-bold text-amber-300">Ход белых</div>
+            <button id="btn-undo" onclick="undoMove()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold p-2.5 rounded-lg shadow hidden">↩️ Отменить ход</button>
+            <button onclick="returnToMenu()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold p-2.5 rounded-lg shadow">⬅️ В главное меню</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "
