@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шахматы</title>
+    <!-- Подключаем легкую библиотеку chessboard.js и chess.js -->
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js"></script>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: #0f172a; 
+            color: #f8fafc; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 10px;
+        }
+        .container { 
+            text-align: center; 
+            max-width: 400px; 
+            width: 100%; 
+            padding: 15px; 
+            background: #1e293b; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+        }
+        #board { 
+            width: 100%; 
+            margin-bottom: 15px; 
+        }
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn:active { background: #2563eb; }
+        #status { 
+            font-size: 13px; 
+            color: #94a3b8; 
+            margin-top: 10px; 
+            min-height: 20px;
+        }
+        /* Подсветка хода */
+        .highlight { background: rgba(34, 197, 94, 0.5) !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3 style="margin-top: 0;">Шахматная партия</h3>
+    <div id="board"></div>
+    <div id="status">Загрузка движка...</div>
+    <!-- Кнопка для получения подсказки прямо на телефоне -->
+    <button class="btn" onclick="requestHint()">💡 Подсказка хода</button>
+</div>
+
+<script>
+    var board = null;
+    var game = new Chess();
+    var stockfish = null;
+    var bestMove = null;
+    var engineReady = false;
+
+    try {
+        stockfish = new Worker('https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js');
+        stockfish.onmessage = function(event) {
+            let message = event.data;
+            if (message === 'readyok') {
+                engineReady = true;
+                $('#status').text('Игра началась. Удачи!');
+            }
+            if (message.startsWith('bestmove')) {
+                bestMove = message.split(' ')[1];
+            }
+        };
+        stockfish.postMessage('uci');
+        stockfish.postMessage('isready');
+    } catch(e) {
+        $('#status').text('Ошибка инициализации движка');
+    }
+
+    function updateStockfish() {
+        if (!engineReady) return;
+        stockfish.postMessage('position fen ' + game.fen());
+        stockfish.postMessage('go depth 10');
+    }
+
+    function removeHighlights() {
+        $('#board .square-55d63').removeClass('highlight');
+    }
+
+    function requestHint() {
+        if (!bestMove) {
+            $('#status').text('Движок думает, подождите секунду...');
+            updateStockfish();
+            return;
+        }
+        removeHighlights();
+        let fromSquare = bestMove.substring(0, 2);
+        let toSquare = bestMove.substring(2, 4);
+
+        // Подсвечиваем зеленым откуда и куда ходить
+        $('#board .square-' + fromSquare).addClass('highlight');
+        $('#board .square-' + toSquare).addClass('highlight');
+        $('#status').text('Ход найден!');
+    }
+
+    var config = {
+        position: 'start',
+        draggable: true,
+        onDrop: function(source, target) {
+            var move = game.move({ from: source, to: target, promotion: 'q' });
+            if (move === null) return 'snapback';
+
+            removeHighlights();
+            updateStockfish();
+        }
+    };
+
+    // Инициализация доски после загрузки страницы
+    $(document).ready(function() {
+        board = Chessboard('board', config);
+        updateStockfish();
+    });
+</script>
+
+</body>
+</html>
