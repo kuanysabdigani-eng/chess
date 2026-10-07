@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шахматы: Карьера и Онлайн</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: #0f172a; 
+            color: #f8fafc; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 10px;
+        }
+        .container { 
+            text-align: center; 
+            max-width: 400px; 
+            width: 100%; 
+            padding: 15px; 
+            background: #1e293b; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+        }
+        #board { 
+            width: 100%; 
+            margin-bottom: 15px; 
+        }
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .btn:active { background: #2563eb; }
+        .btn-secondary { background: #475569; }
+        .btn-success { background: #22c55e; }
+        #status { 
+            font-size: 13px; 
+            color: #94a3b8; 
+            margin-top: 10px; 
+            min-height: 20px;
+        }
+        .highlight { background: rgba(34, 197, 94, 0.5) !important; }
+        .selected { background: rgba(59, 130, 246, 0.6) !important; }
+        .screen { display: none; }
+        .active-screen
